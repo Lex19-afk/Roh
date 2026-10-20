@@ -1,0 +1,856 @@
+```html
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"
+    >
+
+    <title>I Love You Rohlen</title>
+
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            background: #02020a;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+        }
+
+        canvas {
+            position: fixed;
+            inset: 0;
+
+            width: 100%;
+            height: 100%;
+        }
+
+        #codeCanvas {
+            z-index: 1;
+        }
+
+        #heartCanvas {
+            z-index: 2;
+        }
+
+
+        /* =========================================
+           LOVE MESSAGE
+        ========================================= */
+
+        #loveMessage {
+
+            position: fixed;
+
+            left: 50%;
+            top: 50%;
+
+            transform:
+                translate(-50%, -50%)
+                scale(0.5);
+
+            z-index: 20;
+
+            color: white;
+
+            font-family: Arial, sans-serif;
+
+            font-size: clamp(
+                18px,
+                4vw,
+                30px
+            );
+
+            font-weight: bold;
+
+            letter-spacing: clamp(
+                1px,
+                0.8vw,
+                4px
+            );
+
+            text-align: center;
+
+            white-space: nowrap;
+
+            opacity: 0;
+
+            pointer-events: none;
+
+            text-shadow:
+
+                0 0 5px white,
+
+                0 0 10px #8c7cff,
+
+                0 0 20px #735cff,
+
+                0 0 35px #a45cff,
+
+                0 0 55px #438cff;
+
+            transition:
+
+                opacity 1.5s ease,
+
+                transform 1.5s ease;
+        }
+
+
+        /* =========================================
+           SMALL PHONES
+        ========================================= */
+
+        @media (max-width: 480px) {
+
+            #loveMessage {
+
+                font-size: 17px;
+
+                letter-spacing: 1.5px;
+
+            }
+
+        }
+
+
+        /* =========================================
+           VERY SMALL PHONES
+        ========================================= */
+
+        @media (max-width: 360px) {
+
+            #loveMessage {
+
+                font-size: 14px;
+
+                letter-spacing: 1px;
+
+            }
+
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+
+    <canvas id="codeCanvas"></canvas>
+
+    <canvas id="heartCanvas"></canvas>
+
+
+    <div id="loveMessage"></div>
+
+
+    <script>
+
+
+        /* =====================================================
+           CANVAS
+        ===================================================== */
+
+        const codeCanvas =
+            document.getElementById(
+                "codeCanvas"
+            );
+
+        const codeCtx =
+            codeCanvas.getContext("2d");
+
+
+        const heartCanvas =
+            document.getElementById(
+                "heartCanvas"
+            );
+
+        const heartCtx =
+            heartCanvas.getContext("2d");
+
+
+        let width;
+        let height;
+
+
+        function resize() {
+
+            width =
+                window.innerWidth;
+
+            height =
+                window.innerHeight;
+
+
+            const pixelRatio =
+                Math.min(
+                    window.devicePixelRatio || 1,
+                    2
+                );
+
+
+            codeCanvas.width =
+                width * pixelRatio;
+
+            codeCanvas.height =
+                height * pixelRatio;
+
+
+            heartCanvas.width =
+                width * pixelRatio;
+
+            heartCanvas.height =
+                height * pixelRatio;
+
+
+            codeCanvas.style.width =
+                width + "px";
+
+            codeCanvas.style.height =
+                height + "px";
+
+
+            heartCanvas.style.width =
+                width + "px";
+
+            heartCanvas.style.height =
+                height + "px";
+
+
+            codeCtx.setTransform(
+                pixelRatio,
+                0,
+                0,
+                pixelRatio,
+                0,
+                0
+            );
+
+
+            heartCtx.setTransform(
+                pixelRatio,
+                0,
+                0,
+                pixelRatio,
+                0,
+                0
+            );
+
+        }
+
+
+        resize();
+
+
+        window.addEventListener(
+            "resize",
+            resize
+        );
+
+
+        /* =====================================================
+           FALLING CODE
+        ===================================================== */
+
+        const characters =
+            "01ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz<>[]{}()*+-=/\\|#$@%&";
+
+
+        let fontSize =
+            width < 500
+                ? 11
+                : 14;
+
+
+        let columns = [];
+
+
+        function makeColumns() {
+
+            columns = [];
+
+
+            fontSize =
+                width < 500
+                    ? 11
+                    : 14;
+
+
+            const numberOfColumns =
+                Math.floor(
+                    width / fontSize
+                );
+
+
+            for (
+                let i = 0;
+                i < numberOfColumns;
+                i++
+            ) {
+
+                columns.push({
+
+                    x:
+                        i * fontSize,
+
+                    y:
+                        Math.random() *
+                        height,
+
+                    speed:
+                        0.8 +
+                        Math.random() * 2.5,
+
+                    length:
+                        5 +
+                        Math.floor(
+                            Math.random() * 14
+                        )
+
+                });
+
+            }
+
+        }
+
+
+        makeColumns();
+
+
+        function drawCode() {
+
+            codeCtx.fillStyle =
+                "rgba(2, 2, 10, 0.20)";
+
+
+            codeCtx.fillRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            codeCtx.font =
+                fontSize +
+                "px monospace";
+
+
+            for (
+                let i = 0;
+                i < columns.length;
+                i++
+            ) {
+
+                const column =
+                    columns[i];
+
+
+                for (
+                    let j = 0;
+                    j < column.length;
+                    j++
+                ) {
+
+                    const character =
+                        characters[
+                            Math.floor(
+                                Math.random() *
+                                characters.length
+                            )
+                        ];
+
+
+                    const y =
+                        column.y -
+                        j * fontSize;
+
+
+                    if (
+                        y < 0 ||
+                        y > height
+                    ) {
+
+                        continue;
+
+                    }
+
+
+                    const opacity =
+                        0.8 -
+                        (
+                            j /
+                            column.length
+                        ) *
+                        0.7;
+
+
+                    if (
+                        Math.random() < 0.5
+                    ) {
+
+                        codeCtx.fillStyle =
+                            `rgba(
+                                70,
+                                100,
+                                255,
+                                ${opacity}
+                            )`;
+
+                    }
+
+                    else {
+
+                        codeCtx.fillStyle =
+                            `rgba(
+                                180,
+                                80,
+                                255,
+                                ${opacity}
+                            )`;
+
+                    }
+
+
+                    codeCtx.fillText(
+                        character,
+                        column.x,
+                        y
+                    );
+
+                }
+
+
+                column.y +=
+                    column.speed;
+
+
+                if (
+                    column.y >
+                    height +
+                    column.length *
+                    fontSize
+                ) {
+
+                    column.y =
+                        -Math.random() *
+                        height;
+
+                }
+
+            }
+
+
+            requestAnimationFrame(
+                drawCode
+            );
+
+        }
+
+
+        drawCode();
+
+
+        /* =====================================================
+           HEART
+        ===================================================== */
+
+        const particles = [];
+
+
+        /*
+           Fewer particles on mobile
+           so it runs smoothly.
+        */
+
+        const PARTICLE_COUNT =
+            width < 500
+                ? 750
+                : 1400;
+
+
+        function heartShape(t) {
+
+            const x =
+                16 *
+                Math.pow(
+                    Math.sin(t),
+                    3
+                );
+
+
+            const y =
+                13 *
+                Math.cos(t)
+                -
+                5 *
+                Math.cos(2 * t)
+                -
+                2 *
+                Math.cos(3 * t)
+                -
+                Math.cos(4 * t);
+
+
+            return {
+
+                x: x,
+
+                y: -y
+
+            };
+
+        }
+
+
+        function createHeart() {
+
+            particles.length = 0;
+
+
+            /*
+               Smaller heart on phones
+            */
+
+            let scale;
+
+
+            if (
+                width < 500
+            ) {
+
+                scale =
+                    Math.min(
+                        width,
+                        height
+                    ) / 48;
+
+            }
+
+            else {
+
+                scale =
+                    Math.min(
+                        width,
+                        height
+                    ) / 40;
+
+            }
+
+
+            for (
+                let i = 0;
+                i < PARTICLE_COUNT;
+                i++
+            ) {
+
+                const t =
+                    Math.random() *
+                    Math.PI *
+                    2;
+
+
+                const heart =
+                    heartShape(t);
+
+
+                const distance =
+                    Math.sqrt(
+                        Math.random()
+                    );
+
+
+                const targetX =
+                    width / 2 +
+                    heart.x *
+                    scale *
+                    distance;
+
+
+                const targetY =
+                    height / 2 +
+                    heart.y *
+                    scale *
+                    distance;
+
+
+                particles.push({
+
+                    x:
+                        Math.random() *
+                        width,
+
+                    y:
+                        Math.random() *
+                        height,
+
+                    targetX:
+                        targetX,
+
+                    targetY:
+                        targetY,
+
+                    size:
+                        width < 500
+                            ? 0.6 +
+                              Math.random() *
+                              1.3
+                            :
+                              0.7 +
+                              Math.random() *
+                              1.8,
+
+                    speed:
+                        0.025 +
+                        Math.random() *
+                        0.025,
+
+                    purple:
+                        Math.random() <
+                        0.5,
+
+                    phase:
+                        Math.random() *
+                        Math.PI *
+                        2
+
+                });
+
+            }
+
+        }
+
+
+        createHeart();
+
+
+        /* =====================================================
+           HEART ANIMATION
+        ===================================================== */
+
+        let time = 0;
+
+
+        function drawHeart() {
+
+            heartCtx.clearRect(
+                0,
+                0,
+                width,
+                height
+            );
+
+
+            time++;
+
+
+            for (
+                let i = 0;
+                i < particles.length;
+                i++
+            ) {
+
+                const p =
+                    particles[i];
+
+
+                p.x +=
+                    (
+                        p.targetX -
+                        p.x
+                    ) *
+                    p.speed;
+
+
+                p.y +=
+                    (
+                        p.targetY -
+                        p.y
+                    ) *
+                    p.speed;
+
+
+                const movement =
+                    Math.sin(
+                        time * 0.02 +
+                        p.phase
+                    );
+
+
+                const x =
+                    p.x +
+                    movement;
+
+
+                const y =
+                    p.y +
+                    Math.cos(
+                        time * 0.02 +
+                        p.phase
+                    );
+
+
+                let r;
+                let g;
+                let b;
+
+
+                if (
+                    p.purple
+                ) {
+
+                    r = 190;
+                    g = 80;
+                    b = 255;
+
+                }
+
+                else {
+
+                    r = 70;
+                    g = 110;
+                    b = 255;
+
+                }
+
+
+                heartCtx.shadowBlur =
+                    width < 500
+                        ? 8
+                        : 12;
+
+
+                heartCtx.shadowColor =
+                    `rgb(
+                        ${r},
+                        ${g},
+                        ${b}
+                    )`;
+
+
+                heartCtx.fillStyle =
+                    `rgba(
+                        ${r},
+                        ${g},
+                        ${b},
+                        0.85
+                    )`;
+
+
+                heartCtx.beginPath();
+
+
+                heartCtx.arc(
+                    x,
+                    y,
+                    p.size,
+                    0,
+                    Math.PI * 2
+                );
+
+
+                heartCtx.fill();
+
+            }
+
+
+            requestAnimationFrame(
+                drawHeart
+            );
+
+        }
+
+
+        drawHeart();
+
+
+        /* =====================================================
+           I LOVE YOU ROHLEN
+        ===================================================== */
+
+        const message =
+            "I LOVE YOU ROHLEN";
+
+
+        const messageElement =
+            document.getElementById(
+                "loveMessage"
+            );
+
+
+        /*
+           Show after heart starts
+           forming.
+        */
+
+        setTimeout(
+            function () {
+
+                messageElement.style.opacity =
+                    "1";
+
+
+                messageElement.style.transform =
+                    "translate(-50%, -50%) scale(1)";
+
+
+                let current =
+                    0;
+
+
+                function typeText() {
+
+                    if (
+                        current <
+                        message.length
+                    ) {
+
+                        messageElement.textContent =
+                            message.substring(
+                                0,
+                                current + 1
+                            );
+
+
+                        current++;
+
+
+                        setTimeout(
+                            typeText,
+                            100
+                        );
+
+                    }
+
+                }
+
+
+                typeText();
+
+            },
+
+            7000
+        );
+
+
+    </script>
+
+</body>
+</html>
+```
